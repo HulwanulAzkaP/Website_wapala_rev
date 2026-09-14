@@ -1,0 +1,3 @@
+import {HttpError} from "./security";
+export async function boundedBody(request:Request,limit=100000){const reader=request.body?.getReader();if(!reader)throw new HttpError(400,"Data kosong.");const chunks:Uint8Array[]=[];let size=0;while(true){const {value,done}=await reader.read();if(done)break;size+=value.length;if(size>limit){await reader.cancel();throw new HttpError(413,"Data terlalu besar.");}chunks.push(value);}return Buffer.concat(chunks);}
+export async function jsonBody(request:Request,limit=100000){try{return JSON.parse((await boundedBody(request,limit)).toString("utf8"));}catch(e){if(e instanceof HttpError)throw e;throw new HttpError(400,"Data tidak valid.");}}

@@ -1,0 +1,3 @@
+import {notFound} from "next/navigation";import Link from "next/link";import {PublicPage,Heading,currentRecruitment} from "@/server/public";
+export const dynamic="force-dynamic";
+export default async function Recruitment(){const p=await currentRecruitment();if(!p)notFound();return <PublicPage><main id="main"><Heading eyebrow="BERGABUNG BERSAMA WAPALA" title="Langkah kecil. Perjalanan yang berarti." description={p.name}/><section className="container section-space"><p className="prose">{p.description}</p><Link href="/pendaftaran/create" className="button">Mulai pendaftaran ↗</Link></section></main></PublicPage>;}

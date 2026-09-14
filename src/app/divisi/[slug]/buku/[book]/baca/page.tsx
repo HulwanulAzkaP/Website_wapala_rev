@@ -1,0 +1,3 @@
+import {notFound} from "next/navigation";import {PublicPage,Heading} from "@/server/public";import {db} from "@/server/db";import {BookReader} from "@/components/book-reader";
+export const dynamic="force-dynamic";
+export default async function Read({params}:{params:Promise<{slug:string;book:string}>}){const p=await params;const b=await db.book.findFirst({where:{slug:p.book,published:true,division:{slug:p.slug,published:true}}});if(!b)notFound();return <PublicPage><main id="main"><Heading title={b.title} eyebrow="RUANG BACA" description={b.author}/><section className="container section-space"><BookReader bookId={b.id} chapters={b.chapters as {title:string;html:string}[]}/></section></main></PublicPage>;}

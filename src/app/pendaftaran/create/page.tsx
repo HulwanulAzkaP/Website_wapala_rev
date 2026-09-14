@@ -1,0 +1,3 @@
+import {notFound} from "next/navigation";import {PublicPage,Heading,currentRecruitment} from "@/server/public";import {db} from "@/server/db";import {ApplicationForm} from "@/components/application-form";
+export const dynamic="force-dynamic";
+export default async function Apply(){if(!await currentRecruitment())notFound();const programs=await db.reference.findMany({where:{kind:"PROGRAM",active:true},select:{id:true,name:true}});return <PublicPage><main id="main"><Heading title="Awali perjalananmu." eyebrow="PENDAFTARAN ANGGOTA"/><section className="container section-space"><ApplicationForm programs={programs}/></section></main></PublicPage>;}

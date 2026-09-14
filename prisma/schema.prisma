@@ -1,0 +1,337 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          String    @default("EDITOR")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String @id @default(uuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model Reference {
+  id             String        @id @default(uuid())
+  kind           String
+  code           String        @unique
+  name           String
+  facultyId      String?
+  faculty        Reference?    @relation("Faculty", fields: [facultyId], references: [id], onDelete: Restrict)
+  programs       Reference[]   @relation("Faculty")
+  active         Boolean       @default(true)
+  membersProgram Member[]      @relation("Program")
+  membersStatus  Member[]      @relation("Status")
+  applications   Application[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Division {
+  id         String      @id @default(uuid())
+  code       String      @unique
+  name       String
+  slug       String      @unique
+  summary    String      @default("")
+  body       String      @default("")
+  imageId    String?
+  image      MediaAsset? @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  published  Boolean     @default(false)
+  order      Int         @default(0)
+  members    Member[]
+  albums     Album[]
+  activities Activity[]
+  books      Book[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Cohort {
+  id          String      @id @default(uuid())
+  code        String      @unique
+  name        String
+  year        Int?
+  description String      @default("")
+  imageId     String?
+  image       MediaAsset? @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  alt         String      @default("")
+  order       Int         @default(0)
+  published   Boolean     @default(false)
+  members     Member[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String   @default("")
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  albums      Album[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Album {
+  id           String     @id @default(uuid())
+  title        String
+  slug         String     @unique
+  description  String     @default("")
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  divisionId   String?
+  division     Division?  @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  activityDate DateTime?
+  published    Boolean    @default(false)
+  photos       Photo[]
+  activities   Activity[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Photo {
+  id        String     @id @default(uuid())
+  albumId   String
+  album     Album      @relation(fields: [albumId], references: [id], onDelete: Restrict)
+  imageId   String
+  image     MediaAsset @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  alt       String
+  caption   String     @default("")
+  order     Int        @default(0)
+  cover     Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([albumId, imageId])
+}
+
+model Activity {
+  id           String      @id @default(uuid())
+  title        String
+  slug         String      @unique
+  body         String      @default("")
+  activityDate DateTime
+  divisionId   String
+  division     Division    @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  albumId      String?
+  album        Album?      @relation(fields: [albumId], references: [id], onDelete: Restrict)
+  imageId      String?
+  image        MediaAsset? @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  published    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Book {
+  id         String      @id @default(uuid())
+  title      String
+  slug       String      @unique
+  author     String
+  summary    String      @default("")
+  rights     String
+  divisionId String
+  division   Division    @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  imageId    String?
+  image      MediaAsset? @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  chapters   Json
+  published  Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model SiteContent {
+  id        String   @id
+  draft     Json
+  live      Json
+  updatedAt DateTime @updatedAt
+}
+
+model MediaAsset {
+  id           String        @id @default(uuid())
+  storageKey   String        @unique
+  mime         String
+  bytes        Int
+  width        Int
+  height       Int
+  private      Boolean       @default(true)
+  ownerId      String
+  divisions    Division[]
+  cohorts      Cohort[]
+  photos       Photo[]
+  activities   Activity[]
+  books        Book[]
+  members      Member[]
+  applications Application[]
+  createdAt    DateTime      @default(now())
+}
+
+model Member {
+  id             String      @id @default(uuid())
+  name           String
+  nim            String?     @unique
+  nia            String?     @unique
+  sex            String?
+  phone          String?
+  email          String?
+  enrollmentYear String?
+  membershipYear String?
+  divisionId     String?
+  division       Division?   @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  cohortId       String?
+  cohort         Cohort?     @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  programId      String?
+  program        Reference?  @relation("Program", fields: [programId], references: [id], onDelete: Restrict)
+  statusId       String?
+  status         Reference?  @relation("Status", fields: [statusId], references: [id], onDelete: Restrict)
+  imageId        String?
+  image          MediaAsset? @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Dataset {
+  id      String @id @default("members")
+  version Int    @default(0)
+}
+
+model MemberImport {
+  id        String   @id @default(uuid())
+  actorId   String
+  rows      Json
+  counts    Json
+  version   Int
+  committed Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model MemberSnapshot {
+  id        String   @id @default(uuid())
+  actorId   String
+  rows      Json
+  createdAt DateTime @default(now())
+}
+
+model RecruitmentPeriod {
+  id           String        @id @default(uuid())
+  name         String
+  description  String        @default("")
+  enabled      Boolean       @default(false)
+  archived     Boolean       @default(false)
+  opensAt      DateTime?
+  closesAt     DateTime?
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Application {
+  id         String            @id @default(uuid())
+  receipt    String            @unique @default(uuid())
+  requestKey String            @unique
+  periodId   String
+  period     RecruitmentPeriod @relation(fields: [periodId], references: [id], onDelete: Restrict)
+  name       String
+  nim        String
+  email      String
+  phone      String
+  motivation String
+  programId  String
+  program    Reference         @relation(fields: [programId], references: [id], onDelete: Restrict)
+  imageId    String?
+  image      MediaAsset?       @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  decision   String            @default("NEW")
+  emails     EmailOutbox[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@unique([periodId, nim])
+}
+
+model EmailOutbox {
+  id            String       @id @default(uuid())
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  dedupKey      String       @unique
+  recipient     String
+  subject       String
+  text          String
+  state         String       @default("QUEUED")
+  attempts      Int          @default(0)
+  nextAttemptAt DateTime     @default(now())
+  lockedAt      DateTime?
+  providerId    String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  actorId   String
+  action    String
+  target    String
+  createdAt DateTime @default(now())
+}

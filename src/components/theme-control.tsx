@@ -1,0 +1,4 @@
+"use client";
+import {useEffect,useState} from "react";
+import {Moon,Sun} from "lucide-react";
+export function ThemeControl(){const [dark,setDark]=useState(false);useEffect(()=>{const media=matchMedia("(prefers-color-scheme: dark)");const update=()=>{const pref=localStorage.getItem("wapala-theme");const value=pref?pref==="dark":media.matches;document.documentElement.dataset.theme=value?"dark":"light";setDark(value);};update();media.addEventListener("change",update);return()=>media.removeEventListener("change",update);},[]);return <button className="theme-control" aria-label="Ubah tema" title={dark?"Gunakan tema terang":"Gunakan tema gelap"} onClick={()=>{const value=!dark;setDark(value);document.documentElement.dataset.theme=value?"dark":"light";localStorage.setItem("wapala-theme",value?"dark":"light");}}>{dark?<Sun size={19}/>:<Moon size={19}/>}</button>;}

@@ -1,0 +1,2 @@
+import {notFound} from "next/navigation";import {requirePageActor} from "@/server/page-authorization";import {getContent,defaults} from "@/server/site-content";import {ContentEditor} from "@/components/content-editor";
+export default async function ContentPage({params}:{params:Promise<{key:string}>}){await requirePageActor();const {key}=await params;if(!defaults[key])notFound();return <ContentEditor contentKey={key} initial={await getContent(key,true)}/>;}

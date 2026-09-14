@@ -1,0 +1,2 @@
+import {authorize,sameOrigin,errorResponse} from "@/server/security";import {updateApplicant} from "@/server/applicants";import {jsonBody} from "@/server/http";
+export async function PATCH(request:Request,{params}:{params:Promise<{id:string}>}){try{sameOrigin(request);const actor=await authorize(request.headers,"ADMIN");await updateApplicant((await params).id,await jsonBody(request),actor);return Response.json({ok:true});}catch(e){return errorResponse(e);}}

@@ -1,0 +1,3 @@
+import {notFound,redirect} from "next/navigation";import {localSetupEnabled} from "@/server/setup";import {db} from "@/server/db";import {SetupForm} from "@/components/setup-form";
+export const dynamic="force-dynamic";export const metadata={title:"Pengaturan awal",robots:{index:false,follow:false}};
+export default async function Setup(){if(!localSetupEnabled())notFound();if(await db.user.count())redirect("/login");return <main className="login-page"><section className="login-panel"><span className="eyebrow">WAPALA / PENGATURAN LOKAL</span><h1>Buat admin pertama.</h1><p>Pengaturan hanya tersedia di komputer ini dan ditutup otomatis setelah akun pertama dibuat.</p><SetupForm/></section></main>;}

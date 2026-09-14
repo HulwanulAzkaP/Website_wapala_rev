@@ -1,0 +1,6 @@
+node_modules
+.next
+.env*
+var
+test-results
+playwright-report
