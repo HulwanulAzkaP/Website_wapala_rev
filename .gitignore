@@ -1,8 +1,136 @@
+# ==========================================
+# WAPALA WEBSITE
+# Git Ignore
+# ==========================================
+
+# ------------------------------------------
+# Dependencies
+# ------------------------------------------
 node_modules/
-.next/
-.env*
+
+# ------------------------------------------
+# Environment variables
+# ------------------------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep the example environment file
 !.env.example
-var/
+
+# ------------------------------------------
+# Next.js
+# ------------------------------------------
+.next/
+out/
+
+# ------------------------------------------
+# Build output
+# ------------------------------------------
+dist/
+build/
+
+# ------------------------------------------
+# Cache
+# ------------------------------------------
+.cache/
+.turbo/
+.eslintcache
+
+# ------------------------------------------
+# TypeScript
+# ------------------------------------------
+*.tsbuildinfo
+
+# ------------------------------------------
+# Test / Playwright
+# ------------------------------------------
 test-results/
 playwright-report/
-*.tsbuildinfo
+blob-report/
+
+# ------------------------------------------
+# Coverage
+# ------------------------------------------
+coverage/
+
+# ------------------------------------------
+# Logs
+# ------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ------------------------------------------
+# Prisma / local database
+# ------------------------------------------
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Prisma generated client
+prisma/generated/
+
+# ------------------------------------------
+# AI coding assistant files
+# ------------------------------------------
+AGENTS.md
+CLAUDE.md
+
+.cursor/
+.cursorrules
+
+.github/copilot-instructions.md
+
+# ------------------------------------------
+# Local AI / temporary files
+# ------------------------------------------
+.ai/
+.ai-cache/
+.ai-cache/
+models/
+model/
+checkpoints/
+
+# AI model files
+*.gguf
+*.ggml
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+
+# ------------------------------------------
+# Local development
+# ------------------------------------------
+*.local
+
+# ------------------------------------------
+# Operating system
+# ------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------
+# Editor
+# ------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+
+# ------------------------------------------
+# Temporary files
+# ------------------------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
